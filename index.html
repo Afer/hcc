@@ -1,0 +1,268 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>HCC</title>
+		
+		<link rel="stylesheet" href="./spinner.css" ></link>
+		
+		<script>
+			function showLoading() {
+				document.getElementById('form-container').style = "display: none;";
+				document.getElementById('loading').style = "display: flex;";
+			}
+			
+			function hideLoading() {
+				document.getElementById('loading').style = "display: none;";
+				document.getElementById('finished-container').style = "display: block;";
+			}
+			
+			function handleSuccess(response) {
+				console.log('Success!', response)
+				hideLoading();
+			}
+			
+			function handleError(error) {
+				console.error('Error!', error.message)
+				hideLoading();
+			}
+			
+			
+			function isValidValue(formField) {
+				return !!formField.value && !!formField.value.trim();
+			}
+			
+			function isValidName() {
+				const form = document.forms['data-form'];
+				const isValid = isValidValue(form.name);
+				
+				if (isValid) {
+					document.getElementById('name-error').style = "display: none;"
+				}
+				else {
+					document.getElementById('name-error').style = "display: block;"
+				}
+				
+				return isValid;
+			}
+			
+			function isValidEP() {
+				const form = document.forms['data-form'];
+				const isValid = isValidValue(form.email) || isValidValue(form.phone);
+							
+				if (isValid) {
+					document.getElementById('ep-error').style = "display: none;"
+				}
+				else {
+					document.getElementById('ep-error').style = "display: block;"
+				}
+				
+				return isValid;
+			}
+			
+			function isValid() {
+				var isValid = true;
+				
+				isValid = isValidName();
+				
+				isValid = isValid && isValidEP();
+				
+				return isValid;
+			}
+			
+			function initPage() {
+				var submitUrl = "https://script.google.com/macros/s/AKfycbyL_dhw6Qs5JMmppdmjjYD1nclv3mhRyHi7VQjATRSn9edyGkY/exec";
+				
+				const form = document.forms['data-form'];
+
+				form.addEventListener('submit', e => {
+					e.preventDefault();
+					
+					if (!isValid()) {
+						return;
+					}
+					
+					showLoading();
+					
+					var data = {
+						name: document.getElementById('name').value,
+						email: document.getElementById('email').value,
+						phone: document.getElementById('phone').value
+					}
+					
+					fetch(submitUrl, { method: 'POST', body: "{name: '"+document.getElementById('name').value+"', email: '"+document.getElementById('email').value+"', phone: '"+document.getElementById('phone').value+"'}"})
+					.then(handleSuccess)
+					.catch(handleError)
+				});
+			}
+		</script>
+	</head>
+	
+	<body onload="initPage()">
+		<style>
+			body{
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;   
+				background: radial-gradient(#777, #333);
+				color: aliceblue;
+				font-family: sans-serif;
+			}
+			
+			h2 {
+				margin-top: -20px;
+				margin-bottom: 40px;
+			}
+				
+			input, button {
+				background-color: aliceblue;
+			}
+			
+			div{
+				float: left;
+				width: 100%;
+				box-sizing: border-box;
+			}
+			
+			label{
+				display: block;
+				margin-top: 10px;
+			}	
+			
+			button{
+				margin-top: 20px;
+				padding: 10px;
+				font-weight: bold;
+			}
+			
+			div.center-content{
+				float: none;
+				margin: 0 auto;
+				width: 80%;
+			}
+			
+			img {
+				max-width: 760px;
+			}
+			
+			.white-container{
+				background-color: #224;
+				border-radius: 10px;
+				border: 1px solid black;
+				font-size: 14px;
+				font-weight: bold;
+				margin-top: 20px;
+				padding: 10px;
+			}
+			
+			.center-text{
+				text-align: center;
+			}
+			
+			.error-msg {
+				display: none;
+				color: red;
+				font-style: italic;
+				margin-top: 5px;
+			}
+			
+			.form-group {
+				display: flex;
+				flex-direction: column;
+			}
+			
+			.form-content {
+				max-width: 400px;
+			}
+			
+			#loading {
+				justify-content: center;
+				display: none;
+			}
+			
+			#finished-container {
+				display: none;
+			}
+			
+			span {
+				margin: 0 30px;
+				text-transform: uppercase;
+			}
+			
+			.footer {
+				bottom: 0;
+				padding: 20px;
+			}
+			
+			@media  (max-width: 650px){
+				div.center-content{
+					width: 95%;
+				}
+				
+				span {
+					display: block;
+					margin: 10px 0;
+					width: 100%;
+				}
+			}
+			
+		</style>
+		
+		<div class='content'>
+			<div class='center-content center-text'>
+				<img alt="Hollywood Creative Collective" src="./hcc-logo.png" width="100%"/>
+				<h2><span>MANAGEMENT </span><span>BOOKING </span><span>CONSULTING</span></h2>
+				<h3>For all inquries:</h3>
+			</div>
+			<div class='center-content form-content'>
+				<div id="form-container" class='white-container'>
+					<form name="data-form">
+						<div class='form-group'>
+							<label for="name">Name</label>
+							<input id='name' name='name' placeholder="Name" maxlength="100" onkeyup="isValidName()"/>
+							<div id="name-error" class='error-msg'>This field is required</div>
+						</div>
+						
+						<div class='form-group'>
+							<label for="email">Email</label>
+							<input id='email' name='email' placeholder="Email" maxlength="100" onkeyup="isValidEP()"/>
+						</div>
+						
+						<div class='form-group'>
+							<label for='phone'>Phone</label>
+							<input id='phone' name='phone' placeholder="Phone" maxlength="15" onkeyup="isValidEP()"/>
+							<div id="ep-error" class='error-msg'>An email address or phone number is required.</div>
+						</div>
+						
+						<div class='form-group button'>
+							<button id='submit'>Submit</button>
+						</div>
+					</form>
+				</div>
+				
+				<div id="loading">
+					<div class="la-ball-spin-clockwise">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+				</div>
+				
+				<div id="finished-container" class="center-text">
+					<h3>Thank you! Someone will be in touch with you shortly.</h3>
+				</div>
+			</div>
+			
+			<div class='footer center-text'>
+				<span>PITTSBURGH</span>
+				<span>New York City</span>
+				<span>Los Angeles</span>
+			</div>
+		</div>
+	</body>
+</html>
